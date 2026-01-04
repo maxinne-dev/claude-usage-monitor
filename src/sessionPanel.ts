@@ -79,8 +79,8 @@ export class SessionPanel {
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Claude Session Timer</title>
-	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:; script-src 'nonce-${nonce}';">
-	<style>
+	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}'; img-src data:; script-src 'nonce-${nonce}'; font-src 'none';">
+	<style nonce="${nonce}">
 		body {
 			padding: 20px;
 			font-family: var(--vscode-font-family);
@@ -258,14 +258,15 @@ export class SessionPanel {
 	 * HTML for when no session is active
 	 */
 	private getNoSessionHtml(): string {
+		const nonce = this.getNonce();
 		return `<!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Claude Session Timer</title>
-	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:; font-src 'none';">
-	<style>
+	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}'; img-src data:; font-src 'none';">
+	<style nonce="${nonce}">
 		body {
 			padding: 40px;
 			font-family: var(--vscode-font-family);
@@ -295,6 +296,6 @@ export class SessionPanel {
 	}
 
 	private getNonce(): string {
-		return randomBytes(16).toString('base64');
+		return randomBytes(16).toString('hex');
 	}
 }

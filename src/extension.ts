@@ -251,12 +251,8 @@ function isPathInside(targetPath: string, basePath: string): boolean {
 	const resolvedBase = path.resolve(basePath);
 	const resolvedTarget = path.resolve(targetPath);
 
-	if (resolvedBase === resolvedTarget) {
-		return true;
-	}
-
-	const baseWithSep = resolvedBase.endsWith(path.sep) ? resolvedBase : `${resolvedBase}${path.sep}`;
-	return resolvedTarget.startsWith(baseWithSep);
+	const relative = path.relative(resolvedBase, resolvedTarget);
+	return relative === '' || (!relative.startsWith('..') && relative !== '..');
 }
 
 export function deactivate() {}
