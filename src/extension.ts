@@ -256,19 +256,21 @@ function isPathInside(targetPath: string, basePath: string): boolean {
 		return true;
 	}
 
-	if (relative.startsWith('..')) {
-		return false;
-	}
-
-	return !relative.split(path.sep).includes('..');
+	return !relative.startsWith(`..${path.sep}`) && relative !== '..';
 }
 
 function isRegularDirectory(stat: fs.Stats): boolean {
-	return stat.isDirectory() && !stat.isSymbolicLink();
+	if (stat.isSymbolicLink()) {
+		return false;
+	}
+	return stat.isDirectory();
 }
 
 function isRegularFile(stat: fs.Stats): boolean {
-	return stat.isFile() && !stat.isSymbolicLink();
+	if (stat.isSymbolicLink()) {
+		return false;
+	}
+	return stat.isFile();
 }
 
 export function deactivate() {}
