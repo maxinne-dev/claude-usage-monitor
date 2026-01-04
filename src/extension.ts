@@ -266,7 +266,7 @@ function isPathInside(targetPath: string, basePath: string): boolean {
 
 	const relative = path.relative(resolvedBase, resolvedTarget);
 	if (relative === '') {
-		return true;
+		return false;
 	}
 
 	return !relative.startsWith(`..${path.sep}`) && relative !== '..';

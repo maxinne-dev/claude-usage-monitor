@@ -22,15 +22,15 @@ export class SessionPanel {
 			this.panel.reveal();
 		} else {
 			// Create new panel
-			this.panel = vscode.window.createWebviewPanel(
-				'claudeSessionPanel',
-				'Claude Session Timer',
-				vscode.ViewColumn.One,
-				{
-					enableScripts: true,
-					retainContextWhenHidden: true
-				}
-			);
+				this.panel = vscode.window.createWebviewPanel(
+					'claudeSessionPanel',
+					'Claude Session Timer',
+					vscode.ViewColumn.One,
+					{
+						enableScripts: false,
+						retainContextWhenHidden: true
+					}
+				);
 
 			this.panel.webview.html = this.getHtmlContent(session, planConfig);
 
@@ -79,7 +79,7 @@ export class SessionPanel {
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Claude Session Timer</title>
-	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}'; img-src 'none'; script-src 'nonce-${nonce}'; font-src 'none';">
+	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}'; img-src 'none'; script-src 'none'; font-src 'none';">
 	<style nonce="${nonce}">
 		body {
 			padding: 20px;
@@ -244,12 +244,6 @@ export class SessionPanel {
 	</div>
 	` : ''}
 
-	<script nonce="${nonce}">
-		// Auto-refresh every 5 seconds
-		setTimeout(() => {
-			window.location.reload();
-		}, 5000);
-	</script>
 </body>
 </html>`;
 	}
@@ -264,7 +258,7 @@ export class SessionPanel {
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Claude Session Timer</title>
-	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}'; img-src 'none'; font-src 'none';">
+	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}'; img-src 'none'; script-src 'none'; font-src 'none';">
 	<style nonce="${nonce}">
 		body {
 			padding: 40px;
