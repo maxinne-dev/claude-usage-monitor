@@ -52,6 +52,7 @@ export class SessionHoverPanel {
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:; font-src 'none';">
 	<style>
 		* { margin: 0; padding: 0; box-sizing: border-box; }
 		body {

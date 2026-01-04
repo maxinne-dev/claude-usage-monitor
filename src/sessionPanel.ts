@@ -67,6 +67,7 @@ export class SessionPanel {
 			return this.getNoSessionHtml();
 		}
 
+		const nonce = this.getNonce();
 		const usagePercent = (session.totalTokens / planConfig.tokenLimit) * 100;
 		const statusColor = getStatusColor(usagePercent);
 		const timeToLimit = estimateTimeToLimit(session.totalTokens, planConfig.tokenLimit, session.burnRate);
@@ -77,6 +78,7 @@ export class SessionPanel {
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Claude Session Timer</title>
+	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:; script-src 'nonce-${nonce}';">
 	<style>
 		body {
 			padding: 20px;
@@ -241,7 +243,7 @@ export class SessionPanel {
 	</div>
 	` : ''}
 
-	<script>
+	<script nonce="${nonce}">
 		// Auto-refresh every 5 seconds
 		setTimeout(() => {
 			window.location.reload();
@@ -261,6 +263,7 @@ export class SessionPanel {
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Claude Session Timer</title>
+	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; img-src data:; font-src 'none';">
 	<style>
 		body {
 			padding: 40px;
@@ -288,5 +291,14 @@ export class SessionPanel {
 	</div>
 </body>
 </html>`;
+	}
+
+	private getNonce(): string {
+		const possible = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+		let text = '';
+		for (let i = 0; i < 32; i++) {
+			text += possible.charAt(Math.floor(Math.random() * possible.length));
+		}
+		return text;
 	}
 }

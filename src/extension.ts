@@ -51,31 +51,66 @@ export function activate(context: vscode.ExtensionContext) {
 
 			// Step 1: Collect ALL messages from ALL files across ALL projects
 			for (const basePath of claudeDataPaths) {
-				const projectDirs = fs.readdirSync(basePath);
+				const safeBasePath = path.resolve(basePath);
+				const projectDirs = fs.readdirSync(safeBasePath);
 
 				for (const projectDir of projectDirs) {
-					const projectPath = path.join(basePath, projectDir);
+					const projectPath = path.join(safeBasePath, projectDir);
+					let projectStat: fs.Stats;
 
-					if (!fs.statSync(projectPath).isDirectory()) {
+					try {
+						projectStat = fs.lstatSync(projectPath);
+					} catch (err) {
+						console.warn(`Skipping unreadable project path ${projectPath}:`, err);
 						continue;
 					}
 
-					const files = fs.readdirSync(projectPath).filter(f => f.endsWith('.jsonl'));
+					if (!projectStat.isDirectory() || projectStat.isSymbolicLink()) {
+						continue;
+					}
+
+					const resolvedProjectPath = fs.realpathSync(projectPath);
+
+					if (!isPathInside(resolvedProjectPath, safeBasePath)) {
+						console.warn(`Skipping project outside base path: ${resolvedProjectPath}`);
+						continue;
+					}
+
+					const files = fs.readdirSync(resolvedProjectPath).filter(f => f.endsWith('.jsonl'));
 
 					// Read each session file
 					for (const file of files) {
-						const filePath = path.join(projectPath, file);
+						const filePath = path.join(resolvedProjectPath, file);
+						let fileStat: fs.Stats;
 
 						try {
-							const messages = await parseSessionFile(filePath);
+							fileStat = fs.lstatSync(filePath);
+						} catch (err) {
+							console.warn(`Skipping unreadable file ${filePath}:`, err);
+							continue;
+						}
+
+						if (!fileStat.isFile() || fileStat.isSymbolicLink()) {
+							continue;
+						}
+
+						const resolvedFilePath = fs.realpathSync(filePath);
+
+						if (!isPathInside(resolvedFilePath, resolvedProjectPath)) {
+							console.warn(`Skipping file outside project path: ${resolvedFilePath}`);
+							continue;
+						}
+
+						try {
+							const messages = await parseSessionFile(resolvedFilePath);
 
 							// Add all messages with their source file
 							for (const message of messages) {
-								allMessages.push({ message, filePath });
+								allMessages.push({ message, filePath: resolvedFilePath });
 							}
 						} catch (err) {
 							// Skip files that can't be parsed
-							console.warn(`Skipping ${filePath}:`, err);
+							console.warn(`Skipping ${resolvedFilePath}:`, err);
 						}
 					}
 				}
@@ -210,6 +245,11 @@ function getClaudeDataPaths(): string[] {
 	}
 
 	return paths;
+}
+
+function isPathInside(targetPath: string, basePath: string): boolean {
+	const relative = path.relative(basePath, targetPath);
+	return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
 }
 
 export function deactivate() {}
