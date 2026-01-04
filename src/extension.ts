@@ -65,11 +65,17 @@ export function activate(context: vscode.ExtensionContext) {
 						continue;
 					}
 
-					if (!isRegularDirectory(projectStat)) {
+					if (!isSafeDirectory(projectStat)) {
 						continue;
 					}
 
-					const resolvedProjectPath = fs.realpathSync(projectPath);
+					let resolvedProjectPath: string;
+					try {
+						resolvedProjectPath = fs.realpathSync(projectPath);
+					} catch (err) {
+						console.warn(`Skipping project with unresolved path ${projectPath}:`, err);
+						continue;
+					}
 
 					if (!isPathInside(resolvedProjectPath, safeBasePath)) {
 						console.warn(`Skipping project outside base path: ${resolvedProjectPath}`);
@@ -90,11 +96,18 @@ export function activate(context: vscode.ExtensionContext) {
 							continue;
 						}
 
-						if (!isRegularFile(fileStat)) {
+						if (!isSafeFile(fileStat)) {
 							continue;
 						}
 
-						const resolvedFilePath = fs.realpathSync(filePath);
+						let resolvedFilePath: string;
+
+						try {
+							resolvedFilePath = fs.realpathSync(filePath);
+						} catch (err) {
+							console.warn(`Skipping unreadable real path for ${filePath}:`, err);
+							continue;
+						}
 
 						if (!isPathInside(resolvedFilePath, resolvedProjectPath)) {
 							console.warn(`Skipping file outside project path: ${resolvedFilePath}`);
@@ -259,14 +272,16 @@ function isPathInside(targetPath: string, basePath: string): boolean {
 	return !relative.startsWith(`..${path.sep}`) && relative !== '..';
 }
 
-function isRegularDirectory(stat: fs.Stats): boolean {
+// Accept only real directories; exclude symlinks to avoid traversal through links
+function isSafeDirectory(stat: fs.Stats): boolean {
 	if (stat.isSymbolicLink()) {
 		return false;
 	}
 	return stat.isDirectory();
 }
 
-function isRegularFile(stat: fs.Stats): boolean {
+// Accept only real files; exclude symlinks to avoid traversal through links
+function isSafeFile(stat: fs.Stats): boolean {
 	if (stat.isSymbolicLink()) {
 		return false;
 	}
