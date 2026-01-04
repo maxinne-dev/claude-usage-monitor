@@ -65,7 +65,7 @@ export function activate(context: vscode.ExtensionContext) {
 						continue;
 					}
 
-					if (!isSafeDirectory(projectStat)) {
+					if (projectStat.isSymbolicLink() || !projectStat.isDirectory()) {
 						continue;
 					}
 
@@ -96,7 +96,7 @@ export function activate(context: vscode.ExtensionContext) {
 							continue;
 						}
 
-						if (!isSafeFile(fileStat)) {
+						if (fileStat.isSymbolicLink() || !fileStat.isFile()) {
 							continue;
 						}
 
@@ -270,22 +270,6 @@ function isPathInside(targetPath: string, basePath: string): boolean {
 	}
 
 	return !relative.startsWith(`..${path.sep}`) && relative !== '..';
-}
-
-// Accept only real directories; exclude symlinks to avoid traversal through links
-function isSafeDirectory(stat: fs.Stats): boolean {
-	if (stat.isSymbolicLink()) {
-		return false;
-	}
-	return stat.isDirectory();
-}
-
-// Accept only real files; exclude symlinks to avoid traversal through links
-function isSafeFile(stat: fs.Stats): boolean {
-	if (stat.isSymbolicLink()) {
-		return false;
-	}
-	return stat.isFile();
 }
 
 export function deactivate() {}

@@ -64,11 +64,11 @@ export class SessionPanel {
 	 * Generate HTML content for the panel
 	 */
 	private getHtmlContent(session: SessionMetrics | null, planConfig: PlanConfig): string {
+		const nonce = this.getNonce();
 		if (!session) {
-			return this.getNoSessionHtml();
+			return this.getNoSessionHtml(nonce);
 		}
 
-		const nonce = this.getNonce();
 		const usagePercent = (session.totalTokens / planConfig.tokenLimit) * 100;
 		const statusColor = getStatusColor(usagePercent);
 		const timeToLimit = estimateTimeToLimit(session.totalTokens, planConfig.tokenLimit, session.burnRate);
@@ -257,8 +257,7 @@ export class SessionPanel {
 	/**
 	 * HTML for when no session is active
 	 */
-	private getNoSessionHtml(): string {
-		const nonce = this.getNonce();
+	private getNoSessionHtml(nonce: string): string {
 		return `<!DOCTYPE html>
 <html lang="en">
 <head>
