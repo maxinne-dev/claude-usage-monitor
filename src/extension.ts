@@ -65,7 +65,7 @@ export function activate(context: vscode.ExtensionContext) {
 						continue;
 					}
 
-					if (!projectStat.isDirectory() || projectStat.isSymbolicLink()) {
+					if (!isRegularDirectory(projectStat)) {
 						continue;
 					}
 
@@ -90,7 +90,7 @@ export function activate(context: vscode.ExtensionContext) {
 							continue;
 						}
 
-						if (!fileStat.isFile() || fileStat.isSymbolicLink()) {
+						if (!isRegularFile(fileStat)) {
 							continue;
 						}
 
@@ -252,7 +252,23 @@ function isPathInside(targetPath: string, basePath: string): boolean {
 	const resolvedTarget = path.resolve(targetPath);
 
 	const relative = path.relative(resolvedBase, resolvedTarget);
-	return relative === '' || (!relative.startsWith('..') && relative !== '..');
+	if (relative === '') {
+		return true;
+	}
+
+	if (relative.startsWith('..')) {
+		return false;
+	}
+
+	return !relative.split(path.sep).includes('..');
+}
+
+function isRegularDirectory(stat: fs.Stats): boolean {
+	return stat.isDirectory() && !stat.isSymbolicLink();
+}
+
+function isRegularFile(stat: fs.Stats): boolean {
+	return stat.isFile() && !stat.isSymbolicLink();
 }
 
 export function deactivate() {}

@@ -79,7 +79,7 @@ export class SessionPanel {
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Claude Session Timer</title>
-	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}'; img-src data:; script-src 'nonce-${nonce}'; font-src 'none';">
+	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}'; img-src 'none'; script-src 'nonce-${nonce}'; font-src 'none';">
 	<style nonce="${nonce}">
 		body {
 			padding: 20px;
@@ -265,7 +265,7 @@ export class SessionPanel {
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Claude Session Timer</title>
-	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}'; img-src data:; font-src 'none';">
+	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}'; img-src 'none'; font-src 'none';">
 	<style nonce="${nonce}">
 		body {
 			padding: 40px;

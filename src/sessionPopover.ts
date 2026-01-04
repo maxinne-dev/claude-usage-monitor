@@ -54,7 +54,7 @@ export class SessionHoverPanel {
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}'; img-src data:; font-src 'none';">
+	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}'; img-src 'none'; font-src 'none';">
 	<style nonce="${nonce}">
 		* { margin: 0; padding: 0; box-sizing: border-box; }
 		body {
@@ -217,7 +217,7 @@ export class SessionHoverPanel {
 <html>
 <head>
 	<meta charset="UTF-8">
-	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}'; img-src data:; font-src 'none';">
+	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}'; img-src 'none'; font-src 'none';">
 	<style nonce="${nonce}">
 		body {
 			font-family: var(--vscode-font-family);
