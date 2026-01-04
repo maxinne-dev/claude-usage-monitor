@@ -248,8 +248,15 @@ function getClaudeDataPaths(): string[] {
 }
 
 function isPathInside(targetPath: string, basePath: string): boolean {
-	const relative = path.relative(basePath, targetPath);
-	return relative === '' || (!relative.startsWith('..') && !path.isAbsolute(relative));
+	const resolvedBase = path.resolve(basePath);
+	const resolvedTarget = path.resolve(targetPath);
+
+	if (resolvedBase === resolvedTarget) {
+		return true;
+	}
+
+	const baseWithSep = resolvedBase.endsWith(path.sep) ? resolvedBase : `${resolvedBase}${path.sep}`;
+	return resolvedTarget.startsWith(baseWithSep);
 }
 
 export function deactivate() {}
