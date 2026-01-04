@@ -47,17 +47,17 @@ jobs:
 
       - name: Package extension
         if: steps.tag_check.outputs.exists == 'false'
-        run: npx vsce package -o codex-ratelimit-${{ steps.version.outputs.value }}.vsix
+        run: npx vsce package -o claude-code-usage-${{ steps.version.outputs.value }}.vsix
 
       - name: Create GitHub release
         if: steps.tag_check.outputs.exists == 'false'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: v${{ steps.version.outputs.value }}
-          name: Codex Rate Limit v${{ steps.version.outputs.value }}
+          name: Claude Usage Monitor v${{ steps.version.outputs.value }}
           body: |
             Automated release for v${{ steps.version.outputs.value }}.
-          files: codex-ratelimit-${{ steps.version.outputs.value }}.vsix
+          files: claude-code-usage-${{ steps.version.outputs.value }}.vsix
 
       - name: Skip message (tag already exists)
         if: steps.tag_check.outputs.exists == 'true'
