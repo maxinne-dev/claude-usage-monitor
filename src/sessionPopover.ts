@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { randomBytes } from 'crypto';
 import { SessionMetrics, PlanConfig } from './types';
 import { formatTimeRemaining, formatDateTime, getStatusColor, estimateTimeToLimit } from './sessionCalculator';
 
@@ -39,8 +40,9 @@ export class SessionHoverPanel {
 	}
 
 	private getHtmlContent(session: SessionMetrics | null, planConfig: PlanConfig): string {
+		const nonce = this.getNonce();
 		if (!session) {
-			return this.getNoSessionHtml();
+			return this.getNoSessionHtml(nonce);
 		}
 
 		const usagePercent = (session.totalTokens / planConfig.tokenLimit) * 100;
@@ -52,7 +54,8 @@ export class SessionHoverPanel {
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<style>
+	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}'; img-src 'none'; script-src 'none'; font-src 'none';">
+	<style nonce="${nonce}">
 		* { margin: 0; padding: 0; box-sizing: border-box; }
 		body {
 			font-family: var(--vscode-font-family);
@@ -209,12 +212,13 @@ export class SessionHoverPanel {
 </html>`;
 	}
 
-	private getNoSessionHtml(): string {
+	private getNoSessionHtml(nonce: string): string {
 		return `<!DOCTYPE html>
 <html>
 <head>
 	<meta charset="UTF-8">
-	<style>
+	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}'; img-src 'none'; script-src 'none'; font-src 'none';">
+	<style nonce="${nonce}">
 		body {
 			font-family: var(--vscode-font-family);
 			color: var(--vscode-descriptionForeground);
@@ -230,6 +234,10 @@ export class SessionHoverPanel {
 	<p>Start a conversation with Claude Code to begin tracking.</p>
 </body>
 </html>`;
+	}
+
+	private getNonce(): string {
+		return randomBytes(16).toString('hex');
 	}
 }
 

@@ -1,4 +1,5 @@
 import * as vscode from 'vscode';
+import { randomBytes } from 'crypto';
 import { SessionMetrics, PlanConfig } from './types';
 import { formatTimeRemaining, formatDateTime, getStatusColor, estimateTimeToLimit } from './sessionCalculator';
 
@@ -21,15 +22,15 @@ export class SessionPanel {
 			this.panel.reveal();
 		} else {
 			// Create new panel
-			this.panel = vscode.window.createWebviewPanel(
-				'claudeSessionPanel',
-				'Claude Session Timer',
-				vscode.ViewColumn.One,
-				{
-					enableScripts: true,
-					retainContextWhenHidden: true
-				}
-			);
+				this.panel = vscode.window.createWebviewPanel(
+					'claudeSessionPanel',
+					'Claude Session Timer',
+					vscode.ViewColumn.One,
+					{
+						enableScripts: false,
+						retainContextWhenHidden: true
+					}
+				);
 
 			this.panel.webview.html = this.getHtmlContent(session, planConfig);
 
@@ -63,8 +64,9 @@ export class SessionPanel {
 	 * Generate HTML content for the panel
 	 */
 	private getHtmlContent(session: SessionMetrics | null, planConfig: PlanConfig): string {
+		const nonce = this.getNonce();
 		if (!session) {
-			return this.getNoSessionHtml();
+			return this.getNoSessionHtml(nonce);
 		}
 
 		const usagePercent = (session.totalTokens / planConfig.tokenLimit) * 100;
@@ -77,7 +79,8 @@ export class SessionPanel {
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Claude Session Timer</title>
-	<style>
+	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}'; img-src 'none'; script-src 'none'; font-src 'none';">
+	<style nonce="${nonce}">
 		body {
 			padding: 20px;
 			font-family: var(--vscode-font-family);
@@ -241,12 +244,6 @@ export class SessionPanel {
 	</div>
 	` : ''}
 
-	<script>
-		// Auto-refresh every 5 seconds
-		setTimeout(() => {
-			window.location.reload();
-		}, 5000);
-	</script>
 </body>
 </html>`;
 	}
@@ -254,14 +251,15 @@ export class SessionPanel {
 	/**
 	 * HTML for when no session is active
 	 */
-	private getNoSessionHtml(): string {
+	private getNoSessionHtml(nonce: string): string {
 		return `<!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Claude Session Timer</title>
-	<style>
+	<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'nonce-${nonce}'; img-src 'none'; script-src 'none'; font-src 'none';">
+	<style nonce="${nonce}">
 		body {
 			padding: 40px;
 			font-family: var(--vscode-font-family);
@@ -288,5 +286,9 @@ export class SessionPanel {
 	</div>
 </body>
 </html>`;
+	}
+
+	private getNonce(): string {
+		return randomBytes(16).toString('hex');
 	}
 }
